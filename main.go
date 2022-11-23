@@ -10,6 +10,7 @@ import (
 	"strconv"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -23,23 +24,24 @@ var cfg = mysql.Config{
 	DBName: "db",
 }
 
-type Passanger struct {
-	Passanger_Id int    `json:"passanger_id"`
-	First_Name   string `json:"first_name"`
-	Last_Name    string `json:"last_name"`
-	Mobile_No    string `json:"mobile_no"`
-	Email        string `json:"email"`
-}
+// type Passanger struct {
+// 	Passanger_Id int    `json:"passanger_id"`
+// 	First_Name   string `json:"first_name"`
+// 	Last_Name    string `json:"last_name"`
+// 	Mobile_No    string `json:"mobile_no"`
+// 	Email        string `json:"email"`
+// }
 
 func main() {
 	db, _ = sql.Open("mysql", cfg.FormatDSN())
 
+	corsObj := handlers.AllowedOrigins([]string{"*"})
 	router := mux.NewRouter()
 	router.HandleFunc("/api/v1/passanger/{id}", filterPassanger)
 	router.HandleFunc("/api/v1/passanger", passanger)
 
 	fmt.Println("Listening at port 5000")
-	log.Fatal(http.ListenAndServe(":5000", router))
+	log.Fatal(http.ListenAndServe(":5000", handlers.CORS(corsObj)(router)))
 }
 func passanger(w http.ResponseWriter, r *http.Request) {
 
