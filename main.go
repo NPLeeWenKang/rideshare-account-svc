@@ -17,11 +17,12 @@ import (
 var db *sql.DB
 
 var cfg = mysql.Config{
-	User:   "user",
-	Passwd: "password",
-	Net:    "tcp",
-	Addr:   "localhost:3306",
-	DBName: "db",
+	User:      "user",
+	Passwd:    "password",
+	Net:       "tcp",
+	Addr:      "localhost:3306",
+	DBName:    "db",
+	ParseTime: true,
 }
 
 func main() {
@@ -38,6 +39,9 @@ func main() {
 
 	router.HandleFunc("/api/v1/driver/{id}", filterDriver).Methods(http.MethodGet, http.MethodPut)
 	router.HandleFunc("/api/v1/driver", driver).Methods(http.MethodGet, http.MethodPost)
+
+	router.HandleFunc("/api/v1/trip/{id}", filterTrip).Methods(http.MethodGet, http.MethodPut)
+	router.HandleFunc("/api/v1/trip", trip).Methods(http.MethodGet, http.MethodPost)
 
 	fmt.Println("Listening at port 5000")
 	log.Fatal(http.ListenAndServe(":5000", handlers.CORS(allowOrigins, allowMethods, allowHeaders)(router)))
@@ -192,6 +196,85 @@ func filterDriver(w http.ResponseWriter, r *http.Request) {
 					w.WriteHeader(http.StatusAccepted)
 					w.Header().Set("Content-type", "application/json")
 					fmt.Fprintf(w, "%s updated", d.First_Name)
+				} else {
+					w.WriteHeader(http.StatusBadRequest)
+					fmt.Fprintf(w, err.Error())
+				}
+			}
+		}
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "Error")
+	}
+}
+
+func trip(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case http.MethodGet:
+		tList, err := getTrip()
+		if err == nil {
+			w.WriteHeader(http.StatusAccepted)
+			out, _ := json.Marshal(tList)
+			w.Header().Set("Content-type", "application/json")
+			fmt.Fprintf(w, string(out))
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, err.Error())
+		}
+
+	case http.MethodPost:
+		var t Trip
+		if byteBody, ok := ioutil.ReadAll(r.Body); ok == nil {
+			if ok := json.Unmarshal(byteBody, &t); ok == nil {
+				err := insertTrip(t)
+				if err == nil {
+					w.WriteHeader(http.StatusAccepted)
+					w.Header().Set("Content-type", "application/json")
+					fmt.Fprintf(w, "Inserted Trip Id %d", t.Trip_Id)
+				} else {
+					w.WriteHeader(http.StatusBadRequest)
+					fmt.Fprintf(w, err.Error())
+				}
+			}
+		}
+
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		fmt.Fprintf(w, "Error")
+	}
+}
+func filterTrip(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	if _, ok := params["id"]; !ok {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintf(w, "No ID")
+	}
+	id, _ := strconv.Atoi(params["id"])
+
+	switch r.Method {
+	case http.MethodGet:
+
+		tList, err := getTripFilterId(&id)
+		if err == nil {
+			w.WriteHeader(http.StatusAccepted)
+			out, _ := json.Marshal(tList)
+			w.Header().Set("Content-type", "application/json")
+			fmt.Fprintf(w, string(out))
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintf(w, err.Error())
+		}
+
+	case http.MethodPut:
+		var t Trip
+		if byteBody, ok := ioutil.ReadAll(r.Body); ok == nil {
+			if ok := json.Unmarshal(byteBody, &t); ok == nil {
+				err := updateTrip(id, t)
+				if err == nil {
+					w.WriteHeader(http.StatusAccepted)
+					w.Header().Set("Content-type", "application/json")
+					fmt.Fprintf(w, "Updated Trip Id %d", t.Trip_Id)
 				} else {
 					w.WriteHeader(http.StatusBadRequest)
 					fmt.Fprintf(w, err.Error())

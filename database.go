@@ -97,3 +97,53 @@ func updateDriver(id int, d Driver) error {
 	_, err := db.Query("UPDATE driver SET first_name = ?, last_name = ?, mobile_no = ?, email = ?, id_no = ?, car_no = ? WHERE driver_id = ?", d.First_Name, d.Last_Name, d.Mobile_No, d.Email, d.Id_No, d.Car_No, id)
 	return err
 }
+
+func getTrip() ([]Trip, error) {
+	var tList []Trip
+	var rows *sql.Rows
+	var err error
+
+	rows, err = db.Query("SELECT * FROM trip")
+
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var t Trip
+		if err := rows.Scan(&t.Trip_Id, &t.Passanger_Id, &t.Pick_Up, &t.Drop_Off, &t.Start, &t.End); err != nil {
+			return nil, err
+		}
+		tList = append(tList, t)
+	}
+	return tList, nil
+}
+
+func getTripFilterId(id *int) ([]Trip, error) {
+	var tList []Trip
+	var rows *sql.Rows
+	var err error
+
+	rows, err = db.Query("SELECT * FROM trip WHERE trip_id = ?", *id)
+
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var t Trip
+		if err := rows.Scan(&t.Trip_Id, &t.Passanger_Id, &t.Pick_Up, &t.Drop_Off, &t.Start, &t.End); err != nil {
+			return nil, err
+		}
+		tList = append(tList, t)
+	}
+	return tList, nil
+}
+
+func insertTrip(t Trip) error {
+	_, err := db.Query("INSERT INTO trip(trip_id, passanger_id, pick_up, drop_off, start, end) VALUES (?, ?, ?, ?, ?, ?)", t.Trip_Id, t.Passanger_Id, t.Pick_Up, t.Drop_Off, t.Start, t.End)
+	return err
+}
+
+func updateTrip(id int, t Trip) error {
+	_, err := db.Query("UPDATE trip SET passanger_id = ?, pick_up = ?, drop_off = ?, start = ?, end = ? WHERE trip_id = ?", t.Passanger_Id, t.Pick_Up, t.Drop_Off, t.Start, t.End, id)
+	return err
+}
