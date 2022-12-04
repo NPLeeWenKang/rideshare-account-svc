@@ -3,7 +3,7 @@ package main
 import "database/sql"
 
 func getPassanger() ([]Passanger, error) {
-	var pList []Passanger
+	pList := make([]Passanger, 0)
 	var rows *sql.Rows
 	var err error
 
@@ -22,7 +22,7 @@ func getPassanger() ([]Passanger, error) {
 	return pList, nil
 }
 func getPassangerFilterId(id *int) ([]Passanger, error) {
-	var pList []Passanger
+	pList := make([]Passanger, 0)
 	var rows *sql.Rows
 	var err error
 
@@ -51,7 +51,7 @@ func updatePassanger(id int, p Passanger) error {
 }
 
 func getDriver() ([]Driver, error) {
-	var dList []Driver
+	dList := make([]Driver, 0)
 	var rows *sql.Rows
 	var err error
 
@@ -70,7 +70,7 @@ func getDriver() ([]Driver, error) {
 	return dList, nil
 }
 func getDriverFilterId(id *int) ([]Driver, error) {
-	var dList []Driver
+	dList := make([]Driver, 0)
 	var rows *sql.Rows
 	var err error
 
@@ -99,7 +99,7 @@ func updateDriver(id int, d Driver) error {
 }
 
 func getTrip() ([]Trip, error) {
-	var tList []Trip
+	tList := make([]Trip, 0)
 	var rows *sql.Rows
 	var err error
 
@@ -119,7 +119,7 @@ func getTrip() ([]Trip, error) {
 }
 
 func getTripFilterId(id *int) ([]Trip, error) {
-	var tList []Trip
+	tList := make([]Trip, 0)
 	var rows *sql.Rows
 	var err error
 

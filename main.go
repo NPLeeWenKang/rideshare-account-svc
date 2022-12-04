@@ -98,13 +98,15 @@ func filterPassanger(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			w.WriteHeader(http.StatusAccepted)
 			out, _ := json.Marshal(pList)
+			fmt.Println(pList)
+
+			fmt.Println(string(out))
 			w.Header().Set("Content-type", "application/json")
 			fmt.Fprintf(w, string(out))
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
 			fmt.Fprintf(w, err.Error())
 		}
-		fmt.Println(pList)
 
 	case http.MethodPut:
 		var p Passanger
