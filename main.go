@@ -211,18 +211,33 @@ func filterDriver(w http.ResponseWriter, r *http.Request) {
 }
 
 func trip(w http.ResponseWriter, r *http.Request) {
+	querystringmap := r.URL.Query()
+	passangerId := querystringmap["passanger_id"]
 
 	switch r.Method {
 	case http.MethodGet:
-		tList, err := getTrip()
-		if err == nil {
-			w.WriteHeader(http.StatusAccepted)
-			out, _ := json.Marshal(tList)
-			w.Header().Set("Content-type", "application/json")
-			fmt.Fprintf(w, string(out))
+		if len(passangerId) >= 1 {
+			tList, err := getTripFilterPassangerId(passangerId[0])
+			if err == nil {
+				w.WriteHeader(http.StatusAccepted)
+				out, _ := json.Marshal(tList)
+				w.Header().Set("Content-type", "application/json")
+				fmt.Fprintf(w, string(out))
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprintf(w, err.Error())
+			}
 		} else {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintf(w, err.Error())
+			tList, err := getTrip()
+			if err == nil {
+				w.WriteHeader(http.StatusAccepted)
+				out, _ := json.Marshal(tList)
+				w.Header().Set("Content-type", "application/json")
+				fmt.Fprintf(w, string(out))
+			} else {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprintf(w, err.Error())
+			}
 		}
 
 	case http.MethodPost:
