@@ -401,12 +401,13 @@ func tripAssignment(w http.ResponseWriter, r *http.Request) {
 		if byteBody, ok := ioutil.ReadAll(r.Body); ok == nil {
 			if ok := json.Unmarshal(byteBody, &ta); ok == nil {
 				var err error
-				if ta.Status == "ACCEPTED" {
-					err = updateTripAssignmentAndTripStart(ta)
-				} else if ta.Status == "DRIVING" {
-					err = updateTripAssignmentAndTripEnd(ta)
-				} else {
+				if ta.Status == "ACCEPTED" || ta.Status == "REJECTED" {
 					err = updateTripAssignment(ta)
+				} else if ta.Status == "DRIVING" {
+					fmt.Println(ta)
+					err = updateTripAssignmentAndTripStart(ta)
+				} else if ta.Status == "DONE" {
+					err = updateTripAssignmentAndTripEnd(ta)
 				}
 				if err == nil {
 					w.WriteHeader(http.StatusAccepted)
