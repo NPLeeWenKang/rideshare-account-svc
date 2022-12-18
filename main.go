@@ -34,8 +34,8 @@ func main() {
 	allowHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
 
 	router := mux.NewRouter()
-	router.HandleFunc("/api/v1/passanger/{id}", filterPassanger).Methods(http.MethodGet, http.MethodPut)
-	router.HandleFunc("/api/v1/passanger", passanger).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc("/api/v1/passenger/{id}", filterPassenger).Methods(http.MethodGet, http.MethodPut)
+	router.HandleFunc("/api/v1/passenger", passenger).Methods(http.MethodGet, http.MethodPost)
 
 	router.HandleFunc("/api/v1/driver/is_available/{id}", isAvailableDriver).Methods(http.MethodPut)
 	router.HandleFunc("/api/v1/driver/{id}", filterDriver).Methods(http.MethodGet, http.MethodPut)
@@ -44,11 +44,11 @@ func main() {
 	fmt.Println("Listening at port 5000")
 	log.Fatal(http.ListenAndServe(":5000", handlers.CORS(allowOrigins, allowMethods, allowHeaders)(router)))
 }
-func passanger(w http.ResponseWriter, r *http.Request) {
+func passenger(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		pList, err := getPassanger()
+		pList, err := getPassenger()
 		if err == nil {
 			w.WriteHeader(http.StatusAccepted)
 			out, _ := json.Marshal(pList)
@@ -61,10 +61,10 @@ func passanger(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(pList)
 
 	case http.MethodPost:
-		var p Passanger
+		var p Passenger
 		if byteBody, ok := ioutil.ReadAll(r.Body); ok == nil {
 			if ok := json.Unmarshal(byteBody, &p); ok == nil {
-				err := insertPassanger(p)
+				err := insertPassenger(p)
 				if err == nil {
 					w.WriteHeader(http.StatusAccepted)
 					w.Header().Set("Content-type", "application/json")
@@ -81,7 +81,7 @@ func passanger(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Error")
 	}
 }
-func filterPassanger(w http.ResponseWriter, r *http.Request) {
+func filterPassenger(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	if _, ok := params["id"]; !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -92,7 +92,7 @@ func filterPassanger(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 
-		pList, err := getPassangerFilterId(&id)
+		pList, err := getPassengerFilterId(&id)
 		if err == nil {
 			w.WriteHeader(http.StatusAccepted)
 			out, _ := json.Marshal(pList)
@@ -107,10 +107,10 @@ func filterPassanger(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case http.MethodPut:
-		var p Passanger
+		var p Passenger
 		if byteBody, ok := ioutil.ReadAll(r.Body); ok == nil {
 			if ok := json.Unmarshal(byteBody, &p); ok == nil {
-				err := updatePassanger(id, p)
+				err := updatePassenger(id, p)
 				if err == nil {
 					w.WriteHeader(http.StatusAccepted)
 					w.Header().Set("Content-type", "application/json")
