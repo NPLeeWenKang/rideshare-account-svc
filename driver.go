@@ -61,6 +61,7 @@ func insertDriver(d Driver) error {
 	return err
 }
 
+// Driver's identification number has been left out as it cannot be updated
 func updateDriver(id int, d Driver) error {
 	_, err := db.Query("UPDATE driver SET first_name = ?, last_name = ?, mobile_no = ?, email = ?, car_no = ? WHERE driver_id = ?", d.First_Name, d.Last_Name, d.Mobile_No, d.Email, d.Car_No, id)
 	return err

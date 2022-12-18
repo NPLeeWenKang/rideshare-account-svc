@@ -29,6 +29,7 @@ func main() {
 	db, _ = sql.Open("mysql", cfg.FormatDSN())
 	defer db.Close()
 
+	// Settles the CORS errors
 	allowOrigins := handlers.AllowedOrigins([]string{"*"})
 	allowMethods := handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"})
 	allowHeaders := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type"})
